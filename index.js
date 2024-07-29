@@ -5,9 +5,9 @@
     sphereRad: 300,
     bigRedDot: 35,
     mouseSize: 120,
-    massFactor: 0.0002,
+    massFactor: 0.001,
     defColor: `rgba(250, 10, 30, 0.9)`,
-    smooth: 0.8,
+    smooth: 0.9,
   };
 
   const TWO_PI = 2 * Math.PI;
@@ -140,3 +140,4 @@
 
   setInterval(explosion, 5000);
 })();
+// 
