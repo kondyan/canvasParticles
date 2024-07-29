@@ -5,35 +5,61 @@
     sphereRad: 300,
     bigRedDot: 35,
     mouseSize: 120,
-    massFactor: 0.002,
+    massFactor: 0.0002,
     defColor: `rgba(250, 10, 30, 0.9)`,
-    smooth: 0.95,
+    smooth: 0.8,
   };
 
   const TWO_PI = 2 * Math.PI;
   const canvas = document.querySelector(`canvas`);
   const ctx = canvas.getContext(`2d`);
 
-  let w, h, mouse, dots;
+  let w, h, mouse, dots, maxX, maxY, minX, minY;
 
   class Dot {
     constructor(r) {
       this.pos = { x: mouse.x, y: mouse.y };
       this.vel = { x: 0, y: 0 };
       this.rad = r || random(config.dotMinRad, config.dotMaxRad);
-      this.mass = this.rad * config.massFactor;
+      this.mass = r * 0.02 || this.rad * config.massFactor;
       this.color = config.defColor;
     }
 
     draw(x, y) {
       this.pos.x = x || this.pos.x + this.vel.x;
       this.pos.y = y || this.pos.y + this.vel.y;
+      maxX = this.pos.x > maxX ? this.pos.x : maxX;
+      maxY = this.pos.y > maxY ? this.pos.y : maxY;
+
+      minX = this.pos.x < minX ? this.pos.x : minX;
+      minY = this.pos.y < minY ? this.pos.y : minY;
       createCircle(this.pos.x, this.pos.y, this.rad, true, this.color);
       createCircle(this.pos.x, this.pos.y, this.rad, false, config.defColor);
     }
   }
 
+  function explosion() {
+    const centerX = (maxX - minX) / 2 + minX;
+    const centerY = (maxY - minY) / 2 + minY;
+    console.log({
+      centerX,
+      centerY,
+      x: dots[0].pos.x,
+      y: dots[0].pos.y,
+      maxX,
+      minX,
+    });
+    for (let i = 1; i < dots.length; i++) {
+      const newDisX = dots[i].pos.x - centerX;
+      const newDisY = dots[i].pos.y - centerY;
+      dots[i].vel.x = newDisX / 2;
+      dots[i].vel.y = newDisY / 2;
+    }
+  }
+
   function updateDots() {
+    maxX = minX = dots[dots.length - 1].pos.x;
+    maxY = minY = dots[dots.length - 1].pos.y;
     for (let i = 1; i < dots.length; i++) {
       let acc = {
         x: 0,
@@ -111,4 +137,6 @@
   canvas.addEventListener("mousemove", setPos);
   window.addEventListener("mousedown", isDown);
   window.addEventListener("mouseup", isDown);
+
+  setInterval(explosion, 5000);
 })();
